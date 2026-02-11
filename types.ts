@@ -32,3 +32,18 @@ export interface MultiverseTheme {
   };
   uiAccentColor: string;
 }
+
+// Documentation Interfaces
+export interface FieldNote {
+  id: string;
+  nodeId: string;
+  content: string;
+  timestamp: number;
+}
+
+export interface ResearchSession {
+  sessionId: string;
+  createdAt: number;
+  nodes: MultiverseNode[];
+  fieldNotes: FieldNote[];
+}

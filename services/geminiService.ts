@@ -160,3 +160,60 @@ export const generateMultiverseTheme = async (nodes: MultiverseNode[], selectedN
     return null;
   }
 }
+
+export const generateFutureScenario = async (
+  parentNode: MultiverseNode,
+  futureType: FutureType
+): Promise<{ title: string; description: string; principles: string[] } | null> => {
+  if (!apiKey) return null;
+
+  const prompt = `
+    Context: "Designers in Multiverse" - a reflective tool.
+    We are branching from an existing timeline node:
+    Title: ${parentNode.title}
+    Description: ${parentNode.description}
+    Principles: ${parentNode.principles.join(', ')}
+
+    Your task: Generate a specific, creative "${futureType}" future scenario branching from this node.
+    
+    Definitions of Futures:
+    - PROBABLE: Linear projection, business as usual, "more of the same".
+    - PLAUSIBLE: Could happen, slight divergence based on current trends.
+    - POSSIBLE: Might happen, requires new knowledge or technology.
+    - PREPOSTEROUS: Impossible, radical, "magic", or structural collapse.
+
+    Return a JSON object with:
+    1. title: A short, evocative name for this future self/role (e.g., "Data Shaman", "Corporate Rebel").
+    2. description: A 2-sentence description of this reality and its trade-offs.
+    3. principles: An array of 3 concise design principles (strings) guiding this future.
+  `;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: modelId,
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            title: { type: Type.STRING },
+            description: { type: Type.STRING },
+            principles: { 
+              type: Type.ARRAY,
+              items: { type: Type.STRING }
+            }
+          },
+          required: ['title', 'description', 'principles']
+        }
+      }
+    });
+
+    const text = response.text;
+    if (!text) return null;
+    return JSON.parse(text);
+  } catch (error) {
+    console.error("Error generating future scenario:", error);
+    return null;
+  }
+};
