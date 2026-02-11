@@ -121,11 +121,13 @@ const NodeMesh: React.FC<{
       let targetBaseScale = 1.0;
       
       if (isSelected) {
-         targetBaseScale = 1 + Math.sin(t * 3) * 0.1;
+         // Scale up to 1.4x base when selected (plus breathing)
+         targetBaseScale = 1.4 + Math.sin(t * 2) * 0.05;
          if (material) {
-             material.emissiveIntensity = 2.5 + Math.sin(t * 3) * 0.5;
+             material.emissiveIntensity = 2.0 + Math.sin(t * 3) * 0.5;
          }
       } else {
+        // Hover is smaller (1.2x)
         targetBaseScale = hovered ? 1.2 : 1.0;
         if (material) {
             const targetIntensity = hovered ? 1.5 : 0.5;
@@ -141,7 +143,8 @@ const NodeMesh: React.FC<{
     if (haloRef.current) {
         haloRef.current.rotation.z -= 0.005;
         haloRef.current.rotation.y -= 0.005;
-        const haloScale = 1.0 + Math.sin(t * 2) * 0.05;
+        // Subtle pulse for the halo
+        const haloScale = 1.0 + Math.sin(t * 1.5) * 0.02;
         haloRef.current.scale.set(haloScale, haloScale, haloScale);
     }
   });
@@ -179,12 +182,13 @@ const NodeMesh: React.FC<{
             {isSelected && (
                 <>
                     <mesh ref={haloRef}>
-                        <sphereGeometry args={[1.2, 24, 24]} />
+                        {/* Larger radius (1.6) to encompass the scaled up node */}
+                        <sphereGeometry args={[1.6, 24, 24]} />
                         <meshBasicMaterial 
                             color={node.color} 
                             wireframe 
                             transparent 
-                            opacity={0.3} 
+                            opacity={0.15} 
                         />
                     </mesh>
                     <ProceduralArtifact type={node.type} color={node.color} />
